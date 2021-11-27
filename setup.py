@@ -4,7 +4,7 @@ with open("README.md","r") as fh:
   ld = fh.read()
 
 setup(
-  name = 'scikit-ExSTraCS',
+  name = 'scikit-ExSTraCS-RuleInit',
   packages = ['skExSTraCS'],
   version = '1.0.8',
   license='License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
@@ -12,7 +12,7 @@ setup(
   long_description_content_type="text/markdown",
   author = 'Robert Zhang, Ryan J. Urbanowicz',
   author_email = 'robertzh@seas.upenn.edu,ryanurb@upenn.edu',
-  url = 'https://github.com/UrbsLab/scikit-ExSTraCS',
+  url = 'https://github.com/UrbsLab/scikit-ExSTraCS-RuleInit',
   download_url = 'https://github.com/UrbsLab/scikit-ExSTraCS/archive/v_1.0.8.tar.gz',
   keywords = ['machine learning','data analysis','data science','learning classifier systems','exstracs'],
   install_requires=['numpy','pandas','scikit-learn'],
