@@ -9,7 +9,7 @@ from skExSTraCS import Classifier
 from skExSTraCS import OfflineEnvironment
 
 #data parameter: pandas dataframe of original dataset
-#rule_csv: file path of csv containing information for all rules (example included in repository)
+#rule_csv: file path of csv containing information for all rules (example "rules_v2.csv" included in repository)
 #pickle_file: file path of txt used to store rules and reboot LCS 
 
 def RFILCS_Rule_Loading (data, rule_csv, pickle_file, classLabel, number_of_iterations):
