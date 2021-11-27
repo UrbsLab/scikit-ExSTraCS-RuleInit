@@ -317,10 +317,13 @@ def RFILCS_Rule_Loading (data_csv, rule_csv, pickle_file, classLabel, number_of_
 
 # In[ ]:
 
+#data_path: file path to dataset
+#rule_csv_path: file path to output csv with rules
+#pickle_file: file path to txt used to store rules and reboot LCS
 
 def RFI_LCS (data_path, rule_csv_path, pickle_file, list_of_predictors, classLabel, ntrees_RFparam, max_depth_RFparam, min_rows_RFparam, balance_classes_RFparam, seed_RFparam):
     #Intaking data
-    gametes_df = h2o.import_file(path=data_path) #Format of data?
+    gametes_df = h2o.import_file(path=data_path) 
     gametes_df = gametes_df.asfactor()
     gametes_df[classLabel] = gametes_df[classLabel].asfactor()
     predictors = list_of_predictors
