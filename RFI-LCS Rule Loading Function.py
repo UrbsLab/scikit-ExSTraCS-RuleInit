@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-# coding: utf-8
 
-# In[2]:
 
 
 import numpy as np
@@ -11,10 +8,9 @@ from skExSTraCS import ExSTraCS
 from skExSTraCS import Classifier
 from skExSTraCS import OfflineEnvironment
 
-data = pd.read_csv('C://Users//Dasar//Downloads//a_20s_1600her_0.4__maf_0.2_EDM-2_01.txt', delim_whitespace=True)
-all_rules_csv = pd.read_csv('C://Users//Dasar//Downloads//rules_v2.csv')
-rule_csv  = all_rules_csv.sample(n=100, random_state=1)
-pickle_file = "C://Users//Dasar//Downloads//pickle_output.txt"
+#data parameter: pandas dataframe of original dataset
+#rule_csv: file path of csv containing information for all rules (example included in repository)
+#pickle_file: file path of txt used to store rules and reboot LCS 
 
 def RFILCS_Rule_Loading (data, rule_csv, pickle_file, classLabel, number_of_iterations):
     rule_count = rule_csv.shape[0]
@@ -94,11 +90,6 @@ def RFILCS_Rule_Loading (data, rule_csv, pickle_file, classLabel, number_of_iter
     model2.fit(dataFeatures,dataPhenotypes)
     print("Score with LCS after initialization with rules and learning iterations")
     print(model2.score(dataFeatures,dataPhenotypes))
-
-RFILCS_Rule_Loading (data, rule_csv, 'C://Users//Dasar//Downloads//rules_v2.csv', 'Class')
-
-
-# In[ ]:
 
 
 
