@@ -1,9 +1,4 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
+#Importing necessary packages
 import h2o
 import pandas as pd
 from h2o.estimators import H2ORandomForestEstimator
@@ -13,9 +8,9 @@ from collections import Counter
 h2o.init() 
 
 
-# In[ ]:
 
 
+#Defining a class Node
 class Node:
     def __init__(self, l_ch, r_ch, f, cond, r_d, l_d, n_id, n_ind, tree):
         self.left_child = l_ch
@@ -32,6 +27,9 @@ class Node:
         s = "Left Child (index):   " + str(self.left_child) + "\n" + "Right Child (index):   " + str(self.right_child) + "\n" + "Feature:   " + f_str + "\n" + "Right Condition:   " + str(self.r_path)+ "\n" + "Left Condition:   "+str(self.l_path) + "\n" + "Node Condition:   " + str(self.cond) + "\n"
         return s
 
+#Defining a function to round numbers since Random Forest model makes branches at nodes by determining a cutoff for feature values
+#(e.g., if feature 1 > 0.6 then continue to right branch, if feature 1 < 0.6 then continue to left branch
+#The rounding function will convert these cutoff values to a discrete 1 or 0 to be used in the rules (since those are the only possible values of the features)
 def rounding(number):
     if (number >= 0.5):
         number = 1
@@ -39,7 +37,7 @@ def rounding(number):
         number = 0
     return number
 
-# Function to check if a given node is a leaf node or not
+# Function to check if a given node is a leaf node or not (where leaf node is an 'end' node)
 def isLeaf(node):
     if (node.left_child == -1 and node.right_child == -1):
         return True
@@ -192,6 +190,7 @@ def sort(ok, conds):
         
     return ok, organized_cond
 
+#Function to determine the numerosity of rules extracted from RF (numerosity is the number of times each rule occurs)
 def getNumerosity(paths, conds, preds):
     paths_2 = list(paths)
     paths_2, conds_2 = sort(paths_2, list(conds))
@@ -231,10 +230,12 @@ def pathList(data, numerosity, n_paths, n_conds, n_preds):
         data.append([index, ition, ok, numer])
 
 
-# In[ ]:
 
 
+#Defining a function that will read in the rule_csv and then use it to initialize rules to start LCS with
 def RFILCS_Rule_Loading (data_csv, rule_csv, pickle_file, classLabel, number_of_iterations):
+    
+    #Reading in the data and determining number of rules, number of instances in original dataset, and list of attributes in data
     data = pd.read_csv(data_csv)
     rule_count = rule_csv.shape[0]
     instance_count = data.shape[0]
@@ -243,7 +244,8 @@ def RFILCS_Rule_Loading (data_csv, rule_csv, pickle_file, classLabel, number_of_
         attribute_list.append(col)
         
     rule_accuracy_dict = {}
-
+    
+    #Finding the instances in the correct_set and match_set for each rule
     for rule in range (0, rule_count):
         match_set = []
         correct_set = []
@@ -263,14 +265,18 @@ def RFILCS_Rule_Loading (data_csv, rule_csv, pickle_file, classLabel, number_of_
         
             if match == True and data.iloc[instance]['Class'] == rule_csv.iloc[rule]['Class']:
                 correct_set.append(instance)
-    
+        
+        #Calculating rule accuracy based on correct_set and match_set length
         if len(match_set) > 0:
             rule_accuracy_dict[rule] = len(correct_set) / len(match_set)
         elif len(match_set) == 0:
             rule_accuracy_dict[rule] = 0
     
     newPopSet = []
-
+    
+    #creating a Classifier object (part of ExSTRaCS, each classifier object is a rule in the model) to represent each rule
+    #most of the parameters for the Classifier object are place holders, the only important ones needed before pickling the model are attribute index, condition, class, and numerosity
+    #each rule will be added to the newPopSet
     for rule in range (0, rule_count):
         dummymodel = ExSTraCS()
         newClassifier  = Classifier(dummymodel)
@@ -293,11 +299,12 @@ def RFILCS_Rule_Loading (data_csv, rule_csv, pickle_file, classLabel, number_of_
     
         newPopSet.append(newClassifier)
 
-    
+    #Determining the dataFeatures (attributes) and dataPhenotypes (class labels) since they're needed for env; env is needed to pickle the model
     dataFeatures = data.drop(classLabel,axis = 1).values
     dataPhenotypes = data[classLabel].values
     env = OfflineEnvironment(dataFeatures, dataPhenotypes, dummymodel)    
-
+    
+    #Pickling the model into a txt file as specified by the user
     dummymodel = ExSTraCS()
     dummymodel.env = OfflineEnvironment(dataFeatures, dataPhenotypes, dummymodel) 
     dummymodel.hasTrained = True
@@ -306,7 +313,7 @@ def RFILCS_Rule_Loading (data_csv, rule_csv, pickle_file, classLabel, number_of_
     dummymodel.pickle_model(pickle_file)
 
 
-
+    #Running LCS (first with just inputted rules, then with inputted rules used to start LCS with a specified number of iterations)
     model2 = ExSTraCS(learning_iterations = number_of_iterations,nu=10,N=2000,reboot_filename=pickle_file)
     print("Score with inputted rules")
     print(model2.score(dataFeatures,dataPhenotypes))
@@ -321,6 +328,7 @@ def RFILCS_Rule_Loading (data_csv, rule_csv, pickle_file, classLabel, number_of_
 #rule_csv_path: file path to output csv with rules
 #pickle_file: file path to txt used to store rules and reboot LCS
 
+#This function puts all the above functions together to perform the RFI-LCS Task: intializes a RF model, extracts rules, inputs rules to LCS, and runs LCS
 def RFI_LCS (data_path, rule_csv_path, pickle_file, list_of_predictors, classLabel, ntrees_RFparam, max_depth_RFparam, min_rows_RFparam, balance_classes_RFparam, seed_RFparam):
     #Intaking data
     gametes_df = h2o.import_file(path=data_path) 
