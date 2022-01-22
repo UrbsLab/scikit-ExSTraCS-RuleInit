@@ -24,13 +24,13 @@ def RFILCS_Rule_Loading (data, rule_csv, pickle_file, classLabel, number_of_iter
     for rule in range (0, rule_count):
         match_set = []
         correct_set = []
+        attribute_index_string = rule_csv.iloc[rule]['Attribute Index']
+        attribute_index_list = ast.literal_eval(attribute_index_string)
+        condition_string = rule_csv.iloc[rule]['Condition']
+        condition_list = ast.literal_eval(condition_string)
+        
         for instance in range (0, instance_count):
             match = True
-            attribute_index_string = rule_csv.iloc[rule]['Attribute Index']
-            attribute_index_list = ast.literal_eval(attribute_index_string)
-            condition_string = rule_csv.iloc[rule]['Condition']
-            condition_list = ast.literal_eval(condition_string)
-        
             for i in range(0, len(attribute_index_list)):
                 if data.iloc[instance][attribute_list[attribute_index_list[i]]] not in condition_list[i]:
                     match = False
